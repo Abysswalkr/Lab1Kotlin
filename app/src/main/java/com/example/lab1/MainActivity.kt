@@ -1,46 +1,51 @@
 package com.example.lab1
+data class ItemData(val originalPos: Int, val originalValue: Any, val type: String, val info: String?)
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.lab1.ui.theme.Lab1Theme
+fun processList(inputList: List<Any?>?): List<ItemData>? {
+    if (inputList == null) {
+        return null
+    }
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            Lab1Theme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
+    val result = mutableListOf<ItemData>()
+
+    for ((index, value) in inputList.withIndex()) {
+        if (value != null) {
+            val originalPos = index + 1
+            val originalValue = value
+            val type = when (value) {
+                is Int -> "entero"
+                is String -> "cadena"
+                is Boolean -> "booleano"
+                else -> "null"
             }
+            val info = when (value) {
+                is Int -> {
+                    when {
+                        value % 10 == 0 -> "M10"
+                        value % 5 == 0 -> "M5"
+                        value % 2 == 0 -> "M2"
+                        else -> null
+                    }
+                }
+                is String -> "L${value.length}"
+                is Boolean -> if (value) "Verdadero" else "Falso"
+                else -> null
+            }
+
+            val itemData = ItemData(originalPos, originalValue, type, info)
+            result.add(itemData)
         }
     }
+
+    return if (result.isEmpty()) null else result
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun main() {
+    // Example usage:
+    val inputList = listOf(null, null, 5, "Hola", true, null)
+    val outputList = processList(inputList)
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Lab1Theme {
-        Greeting("Android")
+    outputList?.forEach { item ->
+        println("originalPos=${item.originalPos}, originalValue=${item.originalValue}, type=${item.type}, info=${item.info}")
     }
 }
